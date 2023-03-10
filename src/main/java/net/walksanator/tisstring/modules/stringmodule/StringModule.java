@@ -29,11 +29,11 @@ import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
-import java.util.ArrayList;
-import java.util.List;
+
 
 public class StringModule extends AbstractModuleWithRotation {
     static final String TAG_MODE = "mode";
+    static final String TAG_OUTBUF = "outbuf";
 
     enum STATE {
         AWAITING_INPUT,
@@ -69,13 +69,12 @@ public class StringModule extends AbstractModuleWithRotation {
     private static final Charset CP437 = Charset.forName("Cp437");
     private final CharsetEncoder encoder = CP437.newEncoder();
 
-    private List<Short> outbuf;
+    private StringBuilder outbuf;
 
     public StringModule(Casing casing, Face face) {
         super(casing, face);
         this.mode = MODE.INT;
         this.state = STATE.AWAITING_INPUT;
-        this.outbuf = new ArrayList<>();
     }
 
     @Override
@@ -90,7 +89,7 @@ public class StringModule extends AbstractModuleWithRotation {
 
     private void stepInput() throws CharacterCodingException {
         for(final Port port : Port.VALUES) {
-            if (outbuf.size() == 0) {
+            if (outbuf.length() == 0) {
                 state = STATE.AWAITING_INPUT;
             }
             final Pipe receivingPipe = getCasing().getReceivingPipe(getFace(), port);
@@ -104,9 +103,9 @@ public class StringModule extends AbstractModuleWithRotation {
                         String outstring = Integer.toString(val);
                         ByteBuffer bbuf = encoder.encode(CharBuffer.wrap(outstring));
                         while (bbuf.hasRemaining()) {
-                            outbuf.add((short) (bbuf.get() & 0xFF));
+                            outbuf.append((short) (bbuf.get() & 0xFF));
                         }
-                        outbuf.add((short) 0);
+                        outbuf.append((short) 0);
                         state = STATE.OUTPUTTING;
                     }
                     case UNIT -> {
@@ -114,9 +113,9 @@ public class StringModule extends AbstractModuleWithRotation {
                         String outstring = Short.toString(val);
                         ByteBuffer bbuf = encoder.encode(CharBuffer.wrap(outstring));
                         while (bbuf.hasRemaining()) {
-                            outbuf.add((short) (bbuf.get() & 0xFF));
+                            outbuf.append((short) (bbuf.get() & 0xFF));
                         }
-                        outbuf.add((short) 0);
+                        outbuf.append((short) 0);
                         state = STATE.OUTPUTTING;
                     }
                     case FLT -> {
@@ -124,9 +123,9 @@ public class StringModule extends AbstractModuleWithRotation {
                         String outstring = Double.toString(input);
                         ByteBuffer bbuf = encoder.encode(CharBuffer.wrap(outstring));
                         while (bbuf.hasRemaining()) {
-                            outbuf.add((short) (bbuf.get() & 0xFF));
+                            outbuf.append((short) (bbuf.get() & 0xFF));
                         }
-                        outbuf.add((short) 0);
+                        outbuf.append((short) 0);
                         state = STATE.OUTPUTTING;
                     }
                 }
@@ -136,9 +135,9 @@ public class StringModule extends AbstractModuleWithRotation {
 
     private void stepOutput() {
         this.cancelWrite();
-        if (outbuf.size() > 0) {
+        if (outbuf.length() > 0) {
             boolean hasWritten = false;
-            short val = outbuf.get(0);
+            short val = (short) outbuf.charAt(0);
             TISString.LOGGER.info("Writing value {} mode {}",val,mode);
             for (final Port port : Port.VALUES) {
                 final Pipe sendingPipe = getCasing().getSendingPipe(getFace(), port);
@@ -148,7 +147,7 @@ public class StringModule extends AbstractModuleWithRotation {
                     hasWritten = true;
                 }
             }
-            if (hasWritten) {outbuf.remove(0);}
+            if (hasWritten) {outbuf.setLength(outbuf.length() - 1);}
         }
     }
 
@@ -180,12 +179,15 @@ public class StringModule extends AbstractModuleWithRotation {
     public void load(final CompoundTag tag) {
         super.load(tag);
         this.mode = EnumUtils.load(MODE.class, TAG_MODE, tag);
+        this.outbuf.setLength(0);
+        this.outbuf.append(tag.getString(TAG_OUTBUF));
     }
 
     @Override
     public void save(final CompoundTag tag) {
         super.save(tag);
         EnumUtils.save(this.mode, TAG_MODE, tag);
+        tag.putString(TAG_OUTBUF, outbuf.toString());
     }
 
     @OnlyIn(Dist.CLIENT)
