@@ -89,65 +89,75 @@ public class StringModule extends AbstractModuleWithRotation {
 
     private void stepInput() throws CharacterCodingException {
         for(final Port port : Port.VALUES) {
-            if (outbuf.length() == 0) {
-                state = STATE.AWAITING_INPUT;
-            }
             final Pipe receivingPipe = getCasing().getReceivingPipe(getFace(), port);
             if (!receivingPipe.isReading()) {
                 receivingPipe.beginRead();
             }
             if (receivingPipe.canTransfer() && (state == STATE.AWAITING_INPUT) ) {
+                ByteBuffer bbuf = null;
                 switch (this.mode) {
                     case INT -> {
                         int val = receivingPipe.read();
                         String outstring = Integer.toString(val);
-                        ByteBuffer bbuf = encoder.encode(CharBuffer.wrap(outstring));
-                        while (bbuf.hasRemaining()) {
-                            outbuf.append((short) (bbuf.get() & 0xFF));
-                        }
-                        outbuf.append((short) 0);
-                        state = STATE.OUTPUTTING;
+                        bbuf = encoder.encode(CharBuffer.wrap(outstring));
                     }
                     case UNIT -> {
                         short val = receivingPipe.read();
                         String outstring = Short.toString(val);
-                        ByteBuffer bbuf = encoder.encode(CharBuffer.wrap(outstring));
-                        while (bbuf.hasRemaining()) {
-                            outbuf.append((short) (bbuf.get() & 0xFF));
-                        }
-                        outbuf.append((short) 0);
-                        state = STATE.OUTPUTTING;
+                        bbuf = encoder.encode(CharBuffer.wrap(outstring));
                     }
                     case FLT -> {
                         double input = HalfFloat.toFloat(receivingPipe.read());
                         String outstring = Double.toString(input);
-                        ByteBuffer bbuf = encoder.encode(CharBuffer.wrap(outstring));
-                        while (bbuf.hasRemaining()) {
-                            outbuf.append((short) (bbuf.get() & 0xFF));
-                        }
-                        outbuf.append((short) 0);
-                        state = STATE.OUTPUTTING;
+                        bbuf = encoder.encode(CharBuffer.wrap(outstring));
                     }
                 }
+                if (bbuf != null) {
+                } else {
+                    while (bbuf.hasRemaining()) {
+                        outbuf.append((short) (bbuf.get() & 0xFF));
+                    }
+                }
+                outbuf.append((short) 0);
+                state = STATE.OUTPUTTING;
+            }
+        }
+
+    }
+
+    private void stepOutput() {
+        short val = (short) outbuf.charAt(0);
+        TISString.LOGGER.info("Writing value {} mode {}",val,mode);
+        for (final Port port : Port.VALUES) {
+            final Pipe sendingPipe = getCasing().getSendingPipe(getFace(), port);
+            if (!sendingPipe.isWriting()) {
+                TISString.LOGGER.info("writing {} {}", val, port);
+                sendingPipe.beginWrite(val);
             }
         }
     }
 
-    private void stepOutput() {
-        this.cancelWrite();
+    @Override
+    public void onBeforeWriteComplete(final Port port) {
+        // Pop the value (that was being written).
+        outbuf.setLength(outbuf.length() - 1);
+
+        // If one completes, cancel all other writes to ensure a value is only
+        // written once.
+        cancelWrite();
+    }
+
+    @Override
+    public void onWriteComplete(final Port port) {
+        // Re-cancel in case step() was called after onBeforeWriteComplete() to
+        // ensure all our writes are in sync.
+        cancelWrite();
+
+        // If we're done, tell clients we can input again.
         if (outbuf.length() > 0) {
-            boolean hasWritten = false;
-            short val = (short) outbuf.charAt(0);
-            TISString.LOGGER.info("Writing value {} mode {}",val,mode);
-            for (final Port port : Port.VALUES) {
-                final Pipe sendingPipe = getCasing().getSendingPipe(getFace(), port);
-                if (!sendingPipe.isWriting()) {
-                    TISString.LOGGER.info("writing {} {}",val,port);
-                    sendingPipe.beginWrite(val);
-                    hasWritten = true;
-                }
-            }
-            if (hasWritten) {outbuf.setLength(outbuf.length() - 1);}
+            stepOutput();
+        } else {
+            state = STATE.AWAITING_INPUT;
         }
     }
 
@@ -159,20 +169,6 @@ public class StringModule extends AbstractModuleWithRotation {
     @Override
     public void onUninstalled(final ItemStack stack) {
         StringModuleItem.saveToStack(stack, this.mode);
-    }
-
-    @Override
-    public void onBeforeWriteComplete(final Port port) {
-        // If one completes, cancel all other writes to ensure a value is only
-        // written once.
-        cancelWrite();
-    }
-
-    @Override
-    public void onWriteComplete(final Port port) {
-        // Re-cancel in case step() was called after onBeforeWriteComplete() to
-        // ensure we're not writing while waiting for input.
-        cancelWrite();
     }
 
     @Override
