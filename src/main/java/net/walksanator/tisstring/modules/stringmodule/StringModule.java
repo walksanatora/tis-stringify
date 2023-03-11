@@ -75,6 +75,7 @@ public class StringModule extends AbstractModuleWithRotation {
         super(casing, face);
         this.mode = MODE.INT;
         this.state = STATE.AWAITING_INPUT;
+        this.outbuf = new StringBuilder();
     }
 
     @Override
@@ -126,13 +127,15 @@ public class StringModule extends AbstractModuleWithRotation {
     }
 
     private void stepOutput() {
-        short val = (short) outbuf.charAt(0);
-        TISString.LOGGER.info("Writing value {} mode {}",val,mode);
-        for (final Port port : Port.VALUES) {
-            final Pipe sendingPipe = getCasing().getSendingPipe(getFace(), port);
-            if (!sendingPipe.isWriting()) {
-                TISString.LOGGER.info("writing {} {}", val, port);
-                sendingPipe.beginWrite(val);
+        if (outbuf.length() > 0) {
+            short val = (short) outbuf.charAt(0);
+            TISString.LOGGER.info("Writing value {} mode {}",val,mode);
+            for (final Port port : Port.VALUES) {
+                final Pipe sendingPipe = getCasing().getSendingPipe(getFace(), port);
+                if (!sendingPipe.isWriting()) {
+                    TISString.LOGGER.info("writing {} {}", val, port);
+                    sendingPipe.beginWrite(val);
+                }
             }
         }
     }
