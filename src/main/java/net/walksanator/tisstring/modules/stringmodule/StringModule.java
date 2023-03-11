@@ -82,7 +82,7 @@ public class StringModule extends AbstractModuleWithRotation {
     public void step() {
         try {
             this.stepInput();
-            this.stepOutput();
+            //this.stepOutput();
         } catch (CharacterCodingException e) {
             throw new HaltAndCatchFireException();
         }
@@ -99,28 +99,32 @@ public class StringModule extends AbstractModuleWithRotation {
                 switch (this.mode) {
                     case INT -> {
                         int val = receivingPipe.read();
-                        String outstring = Integer.toString(val);
-                        bbuf = encoder.encode(CharBuffer.wrap(outstring));
+                        outbuf.append(val);
+                        //String outstring = Integer.toString(val);
+                        //bbuf = encoder.encode(CharBuffer.wrap(outstring));
                     }
                     case UNIT -> {
                         short val = receivingPipe.read();
-                        String outstring = Short.toString(val);
-                        bbuf = encoder.encode(CharBuffer.wrap(outstring));
+                        outbuf.append(val);
+                        //String outstring = Short.toString(val);
+                        //bbuf = encoder.encode(CharBuffer.wrap(outstring));
                     }
                     case FLT -> {
                         double input = HalfFloat.toFloat(receivingPipe.read());
-                        String outstring = Double.toString(input);
-                        bbuf = encoder.encode(CharBuffer.wrap(outstring));
+                        outbuf.append(input);
+                        //String outstring = Double.toString(input);
+                        //bbuf = encoder.encode(CharBuffer.wrap(outstring));
                     }
                 }
                 if (bbuf != null) {
-                } else {
                     while (bbuf.hasRemaining()) {
                         outbuf.append((short) (bbuf.get() & 0xFF));
                     }
                 }
-                outbuf.append((short) 0);
+                outbuf.append('\0');
+                outbuf.reverse();
                 state = STATE.OUTPUTTING;
+                this.stepOutput();
             }
         }
 
@@ -128,7 +132,7 @@ public class StringModule extends AbstractModuleWithRotation {
 
     private void stepOutput() {
         if (outbuf.length() > 0) {
-            short val = (short) outbuf.charAt(0);
+            short val = (short) outbuf.charAt(outbuf.length() - 1);;
             TISString.LOGGER.info("Writing value {} mode {}",val,mode);
             for (final Port port : Port.VALUES) {
                 final Pipe sendingPipe = getCasing().getSendingPipe(getFace(), port);
