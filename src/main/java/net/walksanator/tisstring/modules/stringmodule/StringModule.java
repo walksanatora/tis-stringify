@@ -25,11 +25,9 @@ import net.minecraftforge.api.distmarker.Dist;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
-
 
 public class StringModule extends AbstractModuleWithRotation {
     static final String TAG_MODE = "mode";
@@ -42,7 +40,7 @@ public class StringModule extends AbstractModuleWithRotation {
 
     enum MODE {
         INT,
-        UNIT,
+        UINT,
         FLT;
 
         MODE next() {
@@ -98,20 +96,17 @@ public class StringModule extends AbstractModuleWithRotation {
                 ByteBuffer bbuf = null;
                 switch (this.mode) {
                     case INT -> {
-                        int val = receivingPipe.read();
-                        outbuf.append(val);
+                        outbuf.append(receivingPipe.read());
                         //String outstring = Integer.toString(val);
                         //bbuf = encoder.encode(CharBuffer.wrap(outstring));
                     }
-                    case UNIT -> {
-                        short val = receivingPipe.read();
-                        outbuf.append(val);
+                    case UINT -> {
+                        outbuf.append(Short.toUnsignedInt(receivingPipe.read()));
                         //String outstring = Short.toString(val);
                         //bbuf = encoder.encode(CharBuffer.wrap(outstring));
                     }
                     case FLT -> {
-                        double input = HalfFloat.toFloat(receivingPipe.read());
-                        outbuf.append(input);
+                        outbuf.append(HalfFloat.toFloat(receivingPipe.read()));
                         //String outstring = Double.toString(input);
                         //bbuf = encoder.encode(CharBuffer.wrap(outstring));
                     }
