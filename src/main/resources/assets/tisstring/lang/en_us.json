@@ -1,4 +1,5 @@
 {
     "item.tisstring.string_module" : "Stringify Module",
+    "item.tisstring.parse_module" : "Parsing Module",
     "tisstring.manual.tab" : "TIS Stringify"
 }

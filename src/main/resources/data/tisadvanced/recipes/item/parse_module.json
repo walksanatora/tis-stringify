@@ -1,0 +1,26 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " Q ",
+        "EPE",
+        " R "
+    ],
+    "key": {
+        "Q": {
+            "item": "tis3d:queue_module"
+        },
+        "E": {
+            "item": "tis3d:execution_module"
+        },
+        "P": {
+            "item": "tis3d:prism"
+        },
+        "R": {
+            "item": "tis3d:random_access_memory_module"
+        }
+    },
+    "result": {
+        "item": "tisstring:parse_module",
+        "count": 1
+    }
+}
