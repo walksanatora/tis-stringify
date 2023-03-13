@@ -1,0 +1,27 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "tisstring:block/infared_peripheral",
+      "x": 90
+    },
+    "facing=east": {
+      "model": "tisstring:block/infared_peripheral",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "tisstring:block/infared_peripheral"
+    },
+    "facing=south": {
+      "model": "tisstring:block/infared_peripheral",
+      "y": 180
+    },
+    "facing=up": {
+      "model": "tisstring:block/infared_peripheral",
+      "x": 270
+    },
+    "facing=west": {
+      "model": "tisstring:block/infared_peripheral",
+      "y": 270
+    }
+  }
+}

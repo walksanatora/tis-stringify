@@ -1,5 +1,12 @@
 package net.walksanator.tisstring;
 
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.loading.FMLLoader;
 import net.walksanator.tisstring.modules.parsemodule.ParseModule;
 import net.walksanator.tisstring.modules.parsemodule.ParseModuleItem;
 import net.walksanator.tisstring.modules.stringmodule.StringModule;
@@ -7,6 +14,7 @@ import net.walksanator.tisstring.modules.stringmodule.StringModuleItem;
 import net.walksanator.tisstring.manual.TISStringContentProvider;
 import net.walksanator.tisstring.manual.TISStringPathProvider;
 import net.walksanator.tisstring.manual.TISStringTab;
+import net.walksanator.tisstring.peripheral.InfaredPeripheral.InfaredPeripheralBlock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,6 +36,8 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
+import java.util.function.Supplier;
+
 @Mod("tisstring")
 public class TISString {
 
@@ -39,17 +49,28 @@ public class TISString {
     static final DeferredRegister<Tab> TABS = DeferredRegister.create(Constants.TAB_REGISTRY, MOD_ID);
     static final DeferredRegister<PathProvider> PATH_PROVIDERS = DeferredRegister.create(Constants.PATH_PROVIDER_REGISTRY, MOD_ID);
     static final DeferredRegister<DocumentProvider> CONTENT_PROVIDERS = DeferredRegister.create(Constants.DOCUMENT_PROVIDER_REGISTRY, MOD_ID);
+    static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS,TISString.MOD_ID);
 
     public static final RegistryObject<StringModuleItem> STR_ITEM = ITEMS.register("string_module", StringModuleItem::new);
     public static final RegistryObject<ParseModuleItem> NUM_ITEM = ITEMS.register("parse_module", ParseModuleItem::new);
+
+    public static RegistryObject<InfaredPeripheralBlock> IR_BLOCK;
+
+    static {
+        if (ModList.get().isLoaded("computercraft")) {
+            IR_BLOCK = registerBlock("infared_peripheral",InfaredPeripheralBlock::new,CreativeModeTab.TAB_MISC);
+        }
+    }
 
     public TISString() {
         
         MODULES.register("string_module", () -> new SimpleModuleProvider<StringModule>(STR_ITEM, StringModule::new));
         MODULES.register("parse_module", () -> new SimpleModuleProvider<ParseModule>(NUM_ITEM, ParseModule::new));
-        
-        MODULES.register(FMLJavaModLoadingContext.get().getModEventBus());
-        ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());
+
+        IEventBus evBus = FMLJavaModLoadingContext.get().getModEventBus();
+        MODULES.register(evBus);
+        ITEMS.register(evBus);
+        BLOCKS.register(evBus);
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             CONTENT_PROVIDERS.register("content_provider", () -> new TISStringContentProvider(MOD_ID,"doc"));
@@ -68,4 +89,12 @@ public class TISString {
             FMLJavaModLoadingContext.get().getModEventBus().register(ClientSetup.class);
         });
     }
+
+    private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block, CreativeModeTab tab) {
+        RegistryObject<T> toReturn = BLOCKS.register(name, block);
+        ITEMS.register(name, () -> new BlockItem(toReturn.get(),
+                new Item.Properties().tab(tab)));
+        return toReturn;
+    }
+
 }

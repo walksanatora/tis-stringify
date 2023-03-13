@@ -164,6 +164,7 @@ dependencies {
 
     implementation fg.deobf("curse.maven:tis3d-238603:3738437")
     implementation fg.deobf("curse.maven:markdownmanual-502485:3738124")
+    implementation fg.deobf("curse.maven:cctweaked-282001:4061947")
 }
 
 mixin {
