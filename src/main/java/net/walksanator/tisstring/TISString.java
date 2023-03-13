@@ -1,5 +1,7 @@
 package net.walksanator.tisstring;
 
+import net.walksanator.tisstring.modules.parsemodule.ParseModule;
+import net.walksanator.tisstring.modules.parsemodule.ParseModuleItem;
 import net.walksanator.tisstring.modules.stringmodule.StringModule;
 import net.walksanator.tisstring.modules.stringmodule.StringModuleItem;
 import net.walksanator.tisstring.manual.TISStringContentProvider;
@@ -39,10 +41,12 @@ public class TISString {
     static final DeferredRegister<DocumentProvider> CONTENT_PROVIDERS = DeferredRegister.create(Constants.DOCUMENT_PROVIDER_REGISTRY, MOD_ID);
 
     public static final RegistryObject<StringModuleItem> STR_ITEM = ITEMS.register("string_module", StringModuleItem::new);
+    public static final RegistryObject<ParseModuleItem> NUM_ITEM = ITEMS.register("parse_module", ParseModuleItem::new);
 
     public TISString() {
         
         MODULES.register("string_module", () -> new SimpleModuleProvider<StringModule>(STR_ITEM, StringModule::new));
+        MODULES.register("parse_module", () -> new SimpleModuleProvider<ParseModule>(NUM_ITEM, ParseModule::new));
         
         MODULES.register(FMLJavaModLoadingContext.get().getModEventBus());
         ITEMS.register(FMLJavaModLoadingContext.get().getModEventBus());

@@ -14,7 +14,8 @@ public class ClientSetup {
     @SubscribeEvent
     public static void handleTextureStitchEvent(final TextureStitchEvent.Pre event) {
         if (Objects.equals(event.getAtlas().location(), InventoryMenu.BLOCK_ATLAS)) {
-            event.addSprite(new ResourceLocation(net.walksanator.tisstring.TISString.MOD_ID,"block/overlay/asic_module"));
+            event.addSprite(new ResourceLocation(net.walksanator.tisstring.TISString.MOD_ID,"block/overlay/string_module"));
+            event.addSprite(new ResourceLocation(net.walksanator.tisstring.TISString.MOD_ID,"block/overlay/parse_module"));
         }
     }
 }
