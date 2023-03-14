@@ -185,7 +185,7 @@ public class StringModule extends AbstractModuleWithRotation {
 
     @OnlyIn(Dist.CLIENT)
     public void render(final RenderContext context) {
-
+        if (!getCasing().isEnabled() || !this.isVisible()) {return;};
         context.drawString(NormalFontRenderer.INSTANCE, this.mode.toString(), 0xFFFF);
 
         final PoseStack matrixStack = context.getMatrixStack();

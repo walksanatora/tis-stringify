@@ -124,10 +124,11 @@ public class InteropModule extends AbstractModuleWithRotation {
 
     @OnlyIn(Dist.CLIENT)
     public void render(final RenderContext context) {
+        if (!getCasing().isEnabled() || !this.isVisible()) {return;};
         final PoseStack matrixStack = context.getMatrixStack();
         matrixStack.pushPose();
         this.rotateForRendering(matrixStack);
-        context.drawAtlasQuadUnlit(new ResourceLocation(TISString.MOD_ID,"block/overlay/parse_module"));
+        context.drawAtlasQuadUnlit(new ResourceLocation(TISString.MOD_ID,"block/overlay/interop_module"));
 
         matrixStack.popPose();
     }
