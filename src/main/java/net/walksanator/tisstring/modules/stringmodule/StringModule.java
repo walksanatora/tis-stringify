@@ -105,7 +105,7 @@ public class StringModule extends AbstractModuleWithRotation {
                         outbuf.append(HalfFloat.toFloat(receivingPipe.read()));
                     }
                     case HEX -> {
-                        outbuf.append(String.format("%04x",receivingPipe.read()));
+                        outbuf.append(String.format("%040x",receivingPipe.read()));
                     }
                     case UHEX -> {
                         outbuf.append(String.format("%04X",receivingPipe.read()));

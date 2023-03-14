@@ -1,12 +1,12 @@
 package net.walksanator.tisstring;
 
+import li.cil.tis3d.common.item.ModuleItem;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.loading.FMLLoader;
+import net.walksanator.tisstring.modules.InteropModule.InteropModule;
 import net.walksanator.tisstring.modules.parsemodule.ParseModule;
 import net.walksanator.tisstring.modules.parsemodule.ParseModuleItem;
 import net.walksanator.tisstring.modules.stringmodule.StringModule;
@@ -14,7 +14,6 @@ import net.walksanator.tisstring.modules.stringmodule.StringModuleItem;
 import net.walksanator.tisstring.manual.TISStringContentProvider;
 import net.walksanator.tisstring.manual.TISStringPathProvider;
 import net.walksanator.tisstring.manual.TISStringTab;
-import net.walksanator.tisstring.peripheral.InfaredPeripheral.InfaredPeripheralBlock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -53,12 +52,12 @@ public class TISString {
 
     public static final RegistryObject<StringModuleItem> STR_ITEM = ITEMS.register("string_module", StringModuleItem::new);
     public static final RegistryObject<ParseModuleItem> NUM_ITEM = ITEMS.register("parse_module", ParseModuleItem::new);
-
-    public static RegistryObject<InfaredPeripheralBlock> IR_BLOCK;
+    public static RegistryObject<ModuleItem> INTEROP_ITEM = null;
 
     static {
         if (ModList.get().isLoaded("computercraft")) {
-            IR_BLOCK = registerBlock("infared_peripheral",InfaredPeripheralBlock::new,CreativeModeTab.TAB_MISC);
+            INTEROP_ITEM = ITEMS.register("interop_module", ModuleItem::new);
+            MODULES.register("interop_module", () -> new SimpleModuleProvider<InteropModule>(INTEROP_ITEM,InteropModule::new));
         }
     }
 

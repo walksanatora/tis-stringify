@@ -1,0 +1,26 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " Q ",
+        "EPM",
+        " Q "
+    ],
+    "key": {
+        "Q": {
+            "item": "tis3d:queue_module"
+        },
+        "E": {
+            "item": "tis3d:execution_module"
+        },
+        "P": {
+            "item": "tis3d:prism"
+        },
+        "Q": {
+            "item": "computercraft:wried_modem_full"
+        }
+    },
+    "result": {
+        "item": "tisstring:interop_module",
+        "count": 1
+    }
+}
