@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -44,14 +45,25 @@ public class CasingPeripheral implements IPeripheral, ICapabilityProvider {
     }
 
     @LuaFunction
-    public Object test() throws LuaException {
-        for (Face face : Face.values()) {
-            AbstractModule mod = (AbstractModule) casing.getModule(face);
-            if (mod instanceof InteropModule) {
-                return ModulePeripheralImpls.get(InteropModule.class).apply(mod);
-            }
+    public Object getFaces() {
+        return Arrays.stream(Face.values()).map(Enum::toString).toArray();
+    }
+    @LuaFunction
+    public Object getFace(String face) throws LuaException {
+        AbstractModule mod = (AbstractModule) casing.getModule(Face.valueOf(face));
+        if (mod == null) {return new Object[]{null,"Face has no module"};}
+        Function<AbstractModule,Object> fn = ModulePeripheralImpls.get(mod.getClass());
+        if (fn != null) {
+            return fn.apply(mod);
         }
-        throw new LuaException("Could not find a InteropModule on casing");
+        return new Object[]{null,"Module does not have a Peripheral Implementation"};
+    }
+
+    @LuaFunction
+    public Object getModule(String face) {
+        AbstractModule mod = (AbstractModule) casing.getModule(Face.valueOf(face));
+        if (mod == null) {return new Object[]{null,"Face has no module"};}
+        return mod.getClass().getName();
     }
 
     @Nonnull
