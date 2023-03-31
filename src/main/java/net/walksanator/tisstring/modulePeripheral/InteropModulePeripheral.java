@@ -10,18 +10,17 @@ import net.walksanator.tisstring.util.HalfFloat;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.ByteBuffer;
+import java.util.Map;
 
 public class InteropModulePeripheral {
-    public static Object newTable(AbstractModule mod) throws LuaException {
+    public static Object newTable(AbstractModule mod) {
         if (mod instanceof InteropModule mod2) {
-            return new Object[]{
-                    new popInt(mod2),
-                    new popFloat(mod2),
-                    new pushNum(mod2)
-            };
-        } else {
-            throw new LuaException("Invalid Module for PeripheralImpl (internal code broken, file a issue)");
-        }
+            return Map.of(
+                    "popInt", new popInt(mod2),
+                    "popFloat", new popFloat(mod2),
+                    "pushNum", new pushNum(mod2)
+            );
+        } else return new Object[]{};
     }
     private static class popInt implements ILuaFunction {
         InteropModule parent;
@@ -66,21 +65,19 @@ public class InteropModulePeripheral {
         @NotNull
         @Override
         public MethodResult call(@NotNull IArguments iArguments) throws LuaException {
-            Object[] values = iArguments.getAll();
-            if (values[0].getClass().equals(Double.class)) {
-                parent.outbuf.add(HalfFloat.toHalf(((Double)values[0]).floatValue()));
-            } else if (values[0].getClass().equals(Integer.class)) {
-                if ((int)values[0] < Short.MAX_VALUE) {
-                    parent.outbuf.add(((Integer)values[0]).shortValue());
-                } else if ((int)values[0] > Short.MAX_VALUE) {
+            double value = iArguments.getDouble(0);
+            if (Math.floor(value) == value) {
+                if ((int)value < Short.MAX_VALUE) {
+                    parent.outbuf.add(((Integer)((int)value)).shortValue());
+                } else {
                     parent.outbuf.add(
                             ByteBuffer.allocate(4)
-                                    .putInt((int)values[0])
+                                    .putInt((int)value)
                                     .getShort(2)
                     );
                 }
             } else {
-                throw new LuaException("Invalid input, expected Number");
+                parent.outbuf.add(HalfFloat.toHalf((float) value));
             }
             return MethodResult.of();
         }
