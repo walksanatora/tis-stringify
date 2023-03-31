@@ -1,7 +1,10 @@
 package net.walksanator.tisstring;
 
+import dan200.computercraft.api.lua.LuaException;
+import dan200.computercraft.api.lua.LuaFunction;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.util.CapabilityUtil;
+import li.cil.tis3d.api.machine.Face;
 import li.cil.tis3d.api.prefab.module.AbstractModule;
 import li.cil.tis3d.common.tileentity.CasingTileEntity;
 import net.minecraft.core.Direction;
@@ -40,7 +43,16 @@ public class CasingPeripheral implements IPeripheral, ICapabilityProvider {
         ModulePeripheralImpls.put(InteropModule.class, InteropModulePeripheral::newTable);
     }
 
-
+    @LuaFunction
+    public Object test() throws LuaException {
+        for (Face face : Face.values()) {
+            AbstractModule mod = (AbstractModule) casing.getModule(face);
+            if (mod instanceof InteropModule) {
+                return ModulePeripheralImpls.get(InteropModule.class).apply(mod);
+            }
+        }
+        throw new LuaException("Could not find a InteropModule on casing");
+    }
 
     @Nonnull
     @Override
