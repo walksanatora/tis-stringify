@@ -1,8 +1,6 @@
 package net.walksanator.tisstring.modules.InteropModule;
 
-import dan200.computercraft.api.lua.IArguments;
-import dan200.computercraft.api.lua.LuaException;
-import dan200.computercraft.api.lua.LuaFunction;
+import dan200.computercraft.api.lua.*;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.util.CapabilityUtil;
 import li.cil.tis3d.api.machine.Face;
@@ -25,7 +23,6 @@ import org.jetbrains.annotations.Nullable;
 import javax.annotation.Nonnull;
 
 import java.nio.ByteBuffer;
-import java.util.Optional;
 
 import static dan200.computercraft.shared.Capabilities.CAPABILITY_PERIPHERAL;
 
@@ -40,8 +37,7 @@ public class CasingPeripheral implements IPeripheral, ICapabilityProvider {
     public final Short popInt() throws LuaException {
         for (Face face : Face.values()) {
             Module mod = casing.getModule(face);
-            if (mod instanceof InteropModule) {
-                InteropModule mod2 = (InteropModule) mod;
+            if (mod instanceof InteropModule mod2) {
                 if (mod2.inbuf.size() > 0) {
                     Short out = mod2.inbuf.get(0);
                     mod2.inbuf.remove(0);
@@ -57,8 +53,7 @@ public class CasingPeripheral implements IPeripheral, ICapabilityProvider {
     public final Integer popUint() throws LuaException {
         for (Face face : Face.values()) {
             Module mod = casing.getModule(face);
-            if (mod instanceof InteropModule) {
-                InteropModule mod2 = (InteropModule) mod;
+            if (mod instanceof InteropModule mod2) {
                 if (mod2.inbuf.size() > 0) {
                     Short out = mod2.inbuf.get(0);
                     mod2.inbuf.remove(0);
@@ -71,11 +66,34 @@ public class CasingPeripheral implements IPeripheral, ICapabilityProvider {
     }
 
     @LuaFunction
+    public final testLuaFn test(IArguments args) throws LuaException {
+        LuaTable<?, ?> argv = args.getTableUnsafe(0);
+        Object argc = args.getAll();
+        TISString.LOGGER.info(argv);
+        TISString.LOGGER.info(argc);
+        return new testLuaFn(3.14);
+    }
+
+    private static class testLuaFn implements ILuaFunction {
+
+        double test;
+        public testLuaFn(double d) {
+            this.test = d;
+        }
+
+        @NotNull
+        @Override
+        public MethodResult call(@NotNull IArguments iArguments) throws LuaException {
+            TISString.LOGGER.info("test function return was called");
+            return MethodResult.of();
+        }
+    }
+
+    @LuaFunction
     public final Float popFloat() throws LuaException {
         for (Face face : Face.values()) {
             Module mod = casing.getModule(face);
-            if (mod instanceof InteropModule) {
-                InteropModule mod2 = (InteropModule) mod;
+            if (mod instanceof InteropModule mod2) {
                 if (mod2.inbuf.size() > 0) {
                     Short out = mod2.inbuf.get(0);
                     mod2.inbuf.remove(0);
@@ -92,8 +110,7 @@ public class CasingPeripheral implements IPeripheral, ICapabilityProvider {
         Double value = args.optDouble(0,0.0);
         for (Face face : Face.values()) {
             Module mod = casing.getModule(face);
-            if (mod instanceof InteropModule) {
-                InteropModule mod2 = (InteropModule) mod;
+            if (mod instanceof InteropModule mod2) {
                 mod2.outbuf.add(HalfFloat.toHalf(value.floatValue()));
                 return;
             }
@@ -106,8 +123,7 @@ public class CasingPeripheral implements IPeripheral, ICapabilityProvider {
         Integer value = args.optInt(0,0);
         for (Face face : Face.values()) {
             Module mod = casing.getModule(face);
-            if (mod instanceof InteropModule) {
-                InteropModule mod2 = (InteropModule) mod;
+            if (mod instanceof InteropModule mod2) {
                 if (value < Short.MAX_VALUE) {
                     mod2.outbuf.add(value.shortValue());
                 } else if (value > Short.MAX_VALUE) {
