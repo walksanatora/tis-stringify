@@ -7,6 +7,7 @@ import dan200.computercraft.shared.util.CapabilityUtil;
 import li.cil.tis3d.api.machine.Face;
 import li.cil.tis3d.api.prefab.module.AbstractModule;
 import li.cil.tis3d.common.tileentity.CasingTileEntity;
+import li.cil.tis3d.common.tileentity.ControllerTileEntity;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -64,6 +65,13 @@ public class CasingPeripheral implements IPeripheral, ICapabilityProvider {
         AbstractModule mod = (AbstractModule) casing.getModule(Face.valueOf(face));
         if (mod == null) {return new Object[]{null,"Face has no module"};}
         return mod.getClass().getName();
+    }
+
+    @LuaFunction
+    public Object getState() {
+        ControllerTileEntity casingte = casing.getController();
+        if (casingte == null) {return new Object[]{null,"Casing does not have a controller attached"};};
+        return casingte.getState().toString();
     }
 
     @Nonnull
