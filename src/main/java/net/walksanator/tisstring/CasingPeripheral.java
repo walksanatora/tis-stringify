@@ -6,6 +6,8 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.util.CapabilityUtil;
 import li.cil.tis3d.api.machine.Face;
 import li.cil.tis3d.api.prefab.module.AbstractModule;
+import li.cil.tis3d.common.module.RandomAccessMemoryModule;
+import li.cil.tis3d.common.module.ReadOnlyMemoryModule;
 import li.cil.tis3d.common.tileentity.CasingTileEntity;
 import li.cil.tis3d.common.tileentity.ControllerTileEntity;
 import net.minecraft.core.Direction;
@@ -18,6 +20,8 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.walksanator.tisstring.modulePeripheral.InteropModulePeripheral;
+import net.walksanator.tisstring.modulePeripheral.RAMModulePeripheral;
+import net.walksanator.tisstring.modulePeripheral.ROMModulePeripheral;
 import net.walksanator.tisstring.modules.InteropModule.InteropModule;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,6 +47,8 @@ public class CasingPeripheral implements IPeripheral, ICapabilityProvider {
 
     static {
         ModulePeripheralImpls.put(InteropModule.class, InteropModulePeripheral::newTable);
+        ModulePeripheralImpls.put(RandomAccessMemoryModule.class, RAMModulePeripheral::newTable);
+        ModulePeripheralImpls.put(ReadOnlyMemoryModule.class, ROMModulePeripheral::newTable);
     }
 
     @LuaFunction

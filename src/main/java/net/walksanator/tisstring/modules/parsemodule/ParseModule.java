@@ -233,31 +233,25 @@ public class ParseModule extends AbstractModuleWithRotation {
         matrixStack.translate(3 / 16f, 5 / 16f, 0);
         matrixStack.scale(1 / 64f, 1 / 64f, 1f);
 
-        if(this.mode.name().length() == 4) {
-            matrixStack.translate(2.5f, 10f, 0);
-        } else if(this.mode.name().length() == 3) {
-            matrixStack.translate(7.25f, 10f, 0);
-        } else if(this.mode.name().length() == 2) {
-            matrixStack.translate(12.5f, 10f, 0);
-        }
+        matrixStack.translate(
+                (-5f*this.mode.name().length())+22.5f,
+                -6f,
+                0
+        );
 
         context.drawString(font, this.mode.name(), Color.WHITE);
 
-        if(this.mode.name().length() == 4) {
-            matrixStack.translate(-2.5f, -5f, 0);
-        } else if(this.mode.name().length() == 3) {
-            matrixStack.translate(-7.25f, -5f, 0);
-        } else if(this.mode.name().length() == 2) {
-            matrixStack.translate(-12.5f, -5f, 0);
-        }
+        matrixStack.translate(
+                ((-5f*this.mode.name().length())+22.5f)*-1,
+                6f,
+                0
+        );
 
-        if(this.on_error.name().length() == 4) {
-            matrixStack.translate(2.5f, -6f, 0);
-        } else if(this.on_error.name().length() == 3) {
-            matrixStack.translate(7.25f, -6f, 0);
-        } else if(this.on_error.name().length() == 2) {
-            matrixStack.translate(12.5f, -6f, 0);
-        }
+        matrixStack.translate(
+                (-5f*this.mode.name().length())+22.5f,
+                10f,
+                0
+        );
 
         context.drawString(font,this.on_error.name(),Color.RED);
     }

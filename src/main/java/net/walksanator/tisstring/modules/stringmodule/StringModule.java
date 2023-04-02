@@ -208,14 +208,23 @@ public class StringModule extends AbstractModuleWithRotation {
         matrixStack.translate(3 / 16f, 5 / 16f, 0);
         matrixStack.scale(1 / 64f, 1 / 64f, 1);
 
-        if(this.mode.name().length() == 4) {
-            matrixStack.translate(2.5f, 5f, 0);
-        } else if(this.mode.name().length() == 3) {
-            matrixStack.translate(7.25f, 5f, 0);
-        } else if(this.mode.name().length() == 2) {
-            matrixStack.translate(12.5f, 5f, 0);
-        }
-
+        //if(this.mode.name().length() == 4) {
+        //    matrixStack.translate(2.5f, 5f, 0);
+        //} else if(this.mode.name().length() == 3) {
+        //    matrixStack.translate(7.25f, 5f, 0);
+        //} else if(this.mode.name().length() == 2) {
+        //    matrixStack.translate(12.5f, 5f, 0);
+        //}
+        matrixStack.translate(
+                (-5f*this.mode.name().length())+22.5f,
+                5f,
+                0
+        );
+        //(4,2.5)
+        //(3,7.5)
+        //(2,12.5)
+        //(1,17.5)
+        //(0,22.5) Y=MX+B B=22.5, M=-5
         context.drawString(font, this.mode.name(), Color.WHITE);
     }
 }
