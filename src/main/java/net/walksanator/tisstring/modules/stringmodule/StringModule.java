@@ -93,7 +93,7 @@ public class StringModule extends AbstractModuleWithRotation {
             if (!receivingPipe.isReading()) {
                 receivingPipe.beginRead();
             }
-            if (receivingPipe.canTransfer() ) {
+            if (receivingPipe.canTransfer() && (state == STATE.AWAITING_INPUT) ) {
                 switch (this.mode) {
                     case INT -> {
                         outbuf.append(receivingPipe.read());
@@ -156,6 +156,12 @@ public class StringModule extends AbstractModuleWithRotation {
         } else {
             state = STATE.AWAITING_INPUT;
         }
+    }
+
+    @Override
+    public void onDisabled() {
+        this.state = STATE.AWAITING_INPUT;
+        this.outbuf.setLength(0); //clear the outbuf
     }
 
     @Override
