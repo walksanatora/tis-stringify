@@ -15,6 +15,7 @@ import li.cil.tis3d.client.manual.Manuals;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public class TISStringTab extends AbstractTab {
 
@@ -42,7 +43,7 @@ public class TISStringTab extends AbstractTab {
     }
 
     @Override
-    public boolean matches(final ManualModel manual) {
+    public boolean matches(final @NotNull ManualModel manual) {
         return Objects.equals(manual, Manuals.MANUAL.get());
     }
 

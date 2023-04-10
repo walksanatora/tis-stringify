@@ -5,6 +5,7 @@ import java.util.Objects;
 import li.cil.manual.api.ManualModel;
 import li.cil.manual.api.prefab.provider.NamespacePathProvider;
 import li.cil.tis3d.client.manual.Manuals;
+import org.jetbrains.annotations.NotNull;
 
 public class TISStringPathProvider extends NamespacePathProvider {
 
@@ -17,7 +18,7 @@ public class TISStringPathProvider extends NamespacePathProvider {
     }
 
     @Override
-    public boolean matches(ManualModel manual) {
+    public boolean matches(@NotNull ManualModel manual) {
         return Objects.equals(manual, Manuals.MANUAL.get());
     }
 

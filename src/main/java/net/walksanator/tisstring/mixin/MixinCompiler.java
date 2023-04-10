@@ -36,5 +36,5 @@ public class MixinCompiler {
         //builder.put(FloatToIntInstruction.NAME, new UnaryInstructionEmitter(() -> FloatToIntInstruction.INSTANCE));
         TISString.LOGGER.info("Finished reg custom ops");
         return builder;
-    };
+    }
 }

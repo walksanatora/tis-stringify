@@ -13,6 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -24,7 +25,7 @@ public class ParseModuleItem extends ModuleItem {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(final Level level, final Player player, final InteractionHand hand) {
+    public @NotNull InteractionResultHolder<ItemStack> use(final @NotNull Level level, final Player player, final @NotNull InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         Tuple<ParseModule.MODE,ParseModule.ERR> data = loadFromStack(stack);
 
@@ -49,7 +50,7 @@ public class ParseModuleItem extends ModuleItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, @NotNull TooltipFlag flagIn) {
         Tuple<ParseModule.MODE,ParseModule.ERR> data = loadFromStack(stack);
 
         tooltip.add(new TextComponent("Mode: " + data.getA()));
@@ -59,12 +60,12 @@ public class ParseModuleItem extends ModuleItem {
 
     public static Tuple<ParseModule.MODE,ParseModule.ERR> loadFromTag(@Nullable final CompoundTag tag) {
         if (tag != null) {
-            return new  Tuple (
+            return new  Tuple<>(
                     EnumUtils.load(ParseModule.MODE.class, ParseModule.TAG_MODE, tag),
                     EnumUtils.load(ParseModule.ERR.class, ParseModule.TAG_ERR, tag)
                     );
         } else {
-            return new Tuple(ParseModule.MODE.INT, ParseModule.ERR.NULL);
+            return new Tuple<>(ParseModule.MODE.INT, ParseModule.ERR.NULL);
         }
     }
 
@@ -82,7 +83,8 @@ public class ParseModuleItem extends ModuleItem {
      * Save the specified ROM data to the specified item stack.
      *
      * @param stack the item stack to save the data to.
-     * @param data  the data to save to the item stack.
+     * @param mode  the mode of the module
+     * @param err   the error configuration of the module
      */
     public static void saveToStack(final ItemStack stack, final ParseModule.MODE mode, final ParseModule.ERR err) {
         final CompoundTag tag = stack.getOrCreateTag();

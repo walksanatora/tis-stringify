@@ -1,8 +1,6 @@
 package net.walksanator.tisstring;
 
 import li.cil.tis3d.common.item.ModuleItem;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModList;
@@ -35,8 +33,6 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
-import java.util.function.Supplier;
-
 @Mod("tisstring")
 public class TISString {
 
@@ -57,14 +53,14 @@ public class TISString {
     static {
         if (ModList.get().isLoaded("computercraft")) {
             INTEROP_ITEM = ITEMS.register("interop_module", ModuleItem::new);
-            MODULES.register("interop_module", () -> new SimpleModuleProvider<InteropModule>(INTEROP_ITEM,InteropModule::new));
+            MODULES.register("interop_module", () -> new SimpleModuleProvider<>(INTEROP_ITEM, InteropModule::new));
         }
     }
 
     public TISString() {
         
-        MODULES.register("string_module", () -> new SimpleModuleProvider<StringModule>(STR_ITEM, StringModule::new));
-        MODULES.register("parse_module", () -> new SimpleModuleProvider<ParseModule>(NUM_ITEM, ParseModule::new));
+        MODULES.register("string_module", () -> new SimpleModuleProvider<>(STR_ITEM, StringModule::new));
+        MODULES.register("parse_module", () -> new SimpleModuleProvider<>(NUM_ITEM, ParseModule::new));
 
         IEventBus evBus = FMLJavaModLoadingContext.get().getModEventBus();
         MODULES.register(evBus);
@@ -74,9 +70,7 @@ public class TISString {
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             CONTENT_PROVIDERS.register("content_provider", () -> new TISStringContentProvider(MOD_ID,"doc"));
             PATH_PROVIDERS.register("path_provider", () -> new TISStringPathProvider(MOD_ID));
-            TABS.register(MOD_ID, () -> {
-                return new TISStringTab(ManualModel.LANGUAGE_KEY + "/tisstring.md", new TranslatableComponent("tisstring.manual.tab"));
-            });
+            TABS.register(MOD_ID, () -> new TISStringTab(ManualModel.LANGUAGE_KEY + "/tisstring.md", new TranslatableComponent("tisstring.manual.tab")));
 
             CONTENT_PROVIDERS.register(FMLJavaModLoadingContext.get().getModEventBus());
             PATH_PROVIDERS.register(FMLJavaModLoadingContext.get().getModEventBus());
@@ -84,16 +78,7 @@ public class TISString {
         });
 
         MinecraftForge.EVENT_BUS.register(this);
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-            FMLJavaModLoadingContext.get().getModEventBus().register(ClientSetup.class);
-        });
-    }
-
-    private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block, CreativeModeTab tab) {
-        RegistryObject<T> toReturn = BLOCKS.register(name, block);
-        ITEMS.register(name, () -> new BlockItem(toReturn.get(),
-                new Item.Properties().tab(tab)));
-        return toReturn;
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> FMLJavaModLoadingContext.get().getModEventBus().register(ClientSetup.class));
     }
 
 }

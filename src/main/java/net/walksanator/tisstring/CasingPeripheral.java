@@ -1,6 +1,5 @@
 package net.walksanator.tisstring;
 
-import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.lua.LuaFunction;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.shared.util.CapabilityUtil;
@@ -56,7 +55,7 @@ public class CasingPeripheral implements IPeripheral, ICapabilityProvider {
         return Arrays.stream(Face.values()).map(Enum::toString).toArray();
     }
     @LuaFunction
-    public Object getFace(String face) throws LuaException {
+    public Object getFace(String face) {
         AbstractModule mod = (AbstractModule) casing.getModule(Face.valueOf(face));
         if (mod == null) {return new Object[]{null,"Face has no module"};}
         Function<AbstractModule,Object> fn = ModulePeripheralImpls.get(mod.getClass());
@@ -76,7 +75,7 @@ public class CasingPeripheral implements IPeripheral, ICapabilityProvider {
     @LuaFunction
     public Object getState() {
         ControllerTileEntity casingte = casing.getController();
-        if (casingte == null) {return new Object[]{null,"Casing does not have a controller attached"};};
+        if (casingte == null) {return new Object[]{null,"Casing does not have a controller attached"};}
         return casingte.getState().toString();
     }
 

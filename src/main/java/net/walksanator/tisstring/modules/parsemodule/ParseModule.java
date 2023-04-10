@@ -20,10 +20,10 @@ import net.walksanator.tisstring.util.HalfFloat;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
+//import java.nio.MappedByteBuffer;
+//import java.nio.charset.CharacterCodingException;
+//import java.nio.charset.Charset;
+//import java.nio.charset.CharsetEncoder;
 
 public class ParseModule extends AbstractModuleWithRotation {
     static final String TAG_MODE = "mode";
@@ -46,13 +46,13 @@ public class ParseModule extends AbstractModuleWithRotation {
             }
         }
 
-        MODE prev() {
-            if(this.ordinal() == 0) {
-                return MODE.values()[MODE.values().length - 1];
-            } else {
-                return MODE.values()[this.ordinal() - 1];
-            }
-        }
+        //MODE prev() {
+        //    if(this.ordinal() == 0) {
+        //        return MODE.values()[MODE.values().length - 1];
+        //    } else {
+        //        return MODE.values()[this.ordinal() - 1];
+        //    }
+        //}
     }
 
     enum ERR {
@@ -67,24 +67,24 @@ public class ParseModule extends AbstractModuleWithRotation {
             }
         }
 
-        ERR prev() {
-            if(this.ordinal() == 0) {
-                return ERR.values()[MODE.values().length - 1];
-            } else {
-                return ERR.values()[this.ordinal() - 1];
-            }
-        }
+        //ERR prev() {
+        //    if(this.ordinal() == 0) {
+        //        return ERR.values()[MODE.values().length - 1];
+        //    } else {
+        //        return ERR.values()[this.ordinal() - 1];
+        //    }
+        //}
     }
 
     private MODE mode;
 
     private ERR on_error;
 
-    private static final Charset CP437 = Charset.forName("Cp437");
-    private final CharsetEncoder encoder = CP437.newEncoder();
+    //private static final Charset CP437 = Charset.forName("Cp437");
+    //private final CharsetEncoder encoder = CP437.newEncoder();
 
-    private StringBuilder outbuf;
-    private StringBuilder inbuf;
+    private final StringBuilder outbuf;
+    private final StringBuilder inbuf;
 
 
     public ParseModule(Casing casing, Face face) {
@@ -140,7 +140,7 @@ public class ParseModule extends AbstractModuleWithRotation {
 
     private void stepOutput() {
         if (outbuf.length() > 0) {
-            short val = (short) outbuf.charAt(outbuf.length() - 1);;
+            short val = (short) outbuf.charAt(outbuf.length() - 1);
             //TISString.LOGGER.info("Writing value {} mode {}",val,mode);
             for (final Port port : Port.VALUES) {
                 final Pipe sendingPipe = getCasing().getSendingPipe(getFace(), port);
@@ -153,7 +153,7 @@ public class ParseModule extends AbstractModuleWithRotation {
     }
 
     @Override
-    public void onBeforeWriteComplete(final Port port) {
+    public void onBeforeWriteComplete(final @NotNull Port port) {
         // Pop the value (that was being written).
         outbuf.setLength(outbuf.length() - 1);
 
@@ -163,7 +163,7 @@ public class ParseModule extends AbstractModuleWithRotation {
     }
 
     @Override
-    public void onWriteComplete(final Port port) {
+    public void onWriteComplete(final @NotNull Port port) {
         // Re-cancel in case step() was called after onBeforeWriteComplete() to
         // ensure all our writes are in sync.
         cancelWrite();
@@ -182,12 +182,12 @@ public class ParseModule extends AbstractModuleWithRotation {
     }
 
     @Override
-    public void onUninstalled(final ItemStack stack) {
+    public void onUninstalled(final @NotNull ItemStack stack) {
         ParseModuleItem.saveToStack(stack, this.mode,this.on_error);
     }
 
     @Override
-    public void load(final CompoundTag tag) {
+    public void load(final @NotNull CompoundTag tag) {
         super.load(tag);
         this.mode = EnumUtils.load(MODE.class, TAG_MODE, tag);
         this.on_error = EnumUtils.load(ERR.class, TAG_ERR, tag);
@@ -199,7 +199,7 @@ public class ParseModule extends AbstractModuleWithRotation {
     }
 
     @Override
-    public void save(final CompoundTag tag) {
+    public void save(final @NotNull CompoundTag tag) {
         super.save(tag);
         EnumUtils.save(this.mode, TAG_MODE, tag);
         EnumUtils.save(this.on_error, TAG_ERR, tag);
@@ -208,8 +208,8 @@ public class ParseModule extends AbstractModuleWithRotation {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public void render(final RenderContext context) {
-        if (!getCasing().isEnabled() || !this.isVisible()) {return;};
+    public void render(final @NotNull RenderContext context) {
+        if (!getCasing().isEnabled() || !this.isVisible()) {return;}
 
         context.drawString(NormalFontRenderer.INSTANCE, this.mode.toString(), 0xFFFF);
 

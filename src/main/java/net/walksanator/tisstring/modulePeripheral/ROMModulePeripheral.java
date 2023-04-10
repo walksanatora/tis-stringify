@@ -19,11 +19,8 @@ public class ROMModulePeripheral {
             );
         } else return new Object[]{};
     }
-    private static class peek implements ILuaFunction {
-        private final ReadOnlyMemoryModule parent;
-        public peek(ReadOnlyMemoryModule parent) {
-            this.parent = parent;
-        }
+
+    private record peek(ReadOnlyMemoryModule parent) implements ILuaFunction {
         @Override
         @NotNull
         public MethodResult call(@NotNull IArguments iArguments) throws LuaException {

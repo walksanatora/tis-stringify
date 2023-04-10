@@ -5,6 +5,7 @@ import java.util.Objects;
 import li.cil.manual.api.ManualModel;
 import li.cil.manual.api.prefab.provider.NamespaceDocumentProvider;
 import li.cil.tis3d.client.manual.Manuals;
+import org.jetbrains.annotations.NotNull;
 
 public class TISStringContentProvider extends NamespaceDocumentProvider {
 
@@ -12,12 +13,8 @@ public class TISStringContentProvider extends NamespaceDocumentProvider {
         super(namespace, basePath);
     }
 
-    public TISStringContentProvider(final String namespace) {
-        super(namespace);
-    }
-
     @Override
-    public boolean matches(ManualModel manual) {
+    public boolean matches(@NotNull ManualModel manual) {
         return Objects.equals(manual, Manuals.MANUAL.get());
     }
 

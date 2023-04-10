@@ -25,8 +25,8 @@ import net.minecraftforge.api.distmarker.Dist;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
+//import java.nio.charset.Charset;
+//import java.nio.charset.CharsetEncoder;
 
 public class StringModule extends AbstractModuleWithRotation {
     static final String TAG_MODE = "mode";
@@ -65,10 +65,10 @@ public class StringModule extends AbstractModuleWithRotation {
 
     private STATE state;
 
-    private static final Charset CP437 = Charset.forName("Cp437");
-    private final CharsetEncoder encoder = CP437.newEncoder();
+    //private static final Charset CP437 = Charset.forName("Cp437");
+    //private final CharsetEncoder encoder = CP437.newEncoder();
 
-    private StringBuilder outbuf;
+    private final StringBuilder outbuf;
 
     public StringModule(Casing casing, Face face) {
         super(casing, face);
@@ -95,21 +95,11 @@ public class StringModule extends AbstractModuleWithRotation {
             }
             if (receivingPipe.canTransfer() && (state == STATE.AWAITING_INPUT) ) {
                 switch (this.mode) {
-                    case INT -> {
-                        outbuf.append(receivingPipe.read());
-                    }
-                    case UINT -> {
-                        outbuf.append(Short.toUnsignedInt(receivingPipe.read()));
-                    }
-                    case FLT -> {
-                        outbuf.append(HalfFloat.toFloat(receivingPipe.read()));
-                    }
-                    case HEX -> {
-                        outbuf.append(String.format("%040x",receivingPipe.read()));
-                    }
-                    case UHEX -> {
-                        outbuf.append(String.format("%04X",receivingPipe.read()));
-                    }
+                    case INT -> outbuf.append(receivingPipe.read());
+                    case UINT -> outbuf.append(Short.toUnsignedInt(receivingPipe.read()));
+                    case FLT -> outbuf.append(HalfFloat.toFloat(receivingPipe.read()));
+                    case HEX -> outbuf.append(String.format("%040x",receivingPipe.read()));
+                    case UHEX -> outbuf.append(String.format("%04X",receivingPipe.read()));
                 }
                 outbuf.append('\0');
                 outbuf.reverse();
@@ -122,7 +112,7 @@ public class StringModule extends AbstractModuleWithRotation {
 
     private void stepOutput() {
         if (outbuf.length() > 0) {
-            short val = (short) outbuf.charAt(outbuf.length() - 1);;
+            short val = (short) outbuf.charAt(outbuf.length() - 1);
             //TISString.LOGGER.info("Writing value {} mode {}",val,mode);
             for (final Port port : Port.VALUES) {
                 final Pipe sendingPipe = getCasing().getSendingPipe(getFace(), port);
@@ -135,7 +125,7 @@ public class StringModule extends AbstractModuleWithRotation {
     }
 
     @Override
-    public void onBeforeWriteComplete(final Port port) {
+    public void onBeforeWriteComplete(final @NotNull Port port) {
         // Pop the value (that was being written).
         outbuf.setLength(outbuf.length() - 1);
 
@@ -145,7 +135,7 @@ public class StringModule extends AbstractModuleWithRotation {
     }
 
     @Override
-    public void onWriteComplete(final Port port) {
+    public void onWriteComplete(final @NotNull Port port) {
         // Re-cancel in case step() was called after onBeforeWriteComplete() to
         // ensure all our writes are in sync.
         cancelWrite();
@@ -170,28 +160,29 @@ public class StringModule extends AbstractModuleWithRotation {
     }
 
     @Override
-    public void onUninstalled(final ItemStack stack) {
+    public void onUninstalled(final @NotNull ItemStack stack) {
         StringModuleItem.saveToStack(stack, this.mode);
     }
 
     @Override
-    public void load(final CompoundTag tag) {
+    public void load(final @NotNull CompoundTag tag) {
         super.load(tag);
         this.mode = EnumUtils.load(MODE.class, TAG_MODE, tag);
         this.outbuf.setLength(0);
         this.outbuf.append(tag.getString(TAG_OUTBUF));
+        if (this.outbuf.length() > 0) {this.state = STATE.OUTPUTTING;} else {this.state = STATE.AWAITING_INPUT;}
     }
 
     @Override
-    public void save(final CompoundTag tag) {
+    public void save(final @NotNull CompoundTag tag) {
         super.save(tag);
         EnumUtils.save(this.mode, TAG_MODE, tag);
         tag.putString(TAG_OUTBUF, outbuf.toString());
     }
 
     @OnlyIn(Dist.CLIENT)
-    public void render(final RenderContext context) {
-        if (!getCasing().isEnabled() || !this.isVisible()) {return;};
+    public void render(final @NotNull RenderContext context) {
+        if (!getCasing().isEnabled() || !this.isVisible()) {return;}
         context.drawString(NormalFontRenderer.INSTANCE, this.mode.toString(), 0xFFFF);
 
         final PoseStack matrixStack = context.getMatrixStack();

@@ -16,6 +16,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 // import net.minecraft.world.level.block.entity.BedBlockEntity;
 
@@ -26,7 +27,7 @@ public class StringModuleItem extends ModuleItem {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(final Level level, final Player player, final InteractionHand hand) {
+    public @NotNull InteractionResultHolder<ItemStack> use(final @NotNull Level level, final Player player, final @NotNull InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         StringModule.MODE mode = loadFromStack(stack);
 
@@ -45,7 +46,7 @@ public class StringModuleItem extends ModuleItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
+    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, @NotNull TooltipFlag flagIn) {
         StringModule.MODE mode = loadFromStack(stack);
 
         tooltip.add(new TextComponent("Mode: " + mode.toString()));
@@ -74,7 +75,7 @@ public class StringModuleItem extends ModuleItem {
      * Save the specified ROM data to the specified item stack.
      *
      * @param stack the item stack to save the data to.
-     * @param data  the data to save to the item stack.
+     * @param mode  the current mode of the module
      */
     public static void saveToStack(final ItemStack stack, final StringModule.MODE mode) {
         final CompoundTag tag = stack.getOrCreateTag();

@@ -17,11 +17,8 @@ public class RAMModulePeripheral {
             );
         } else return new Object[]{};
     }
-    private static class peek implements ILuaFunction {
-        private final RandomAccessMemoryModule parent;
-        public peek(RandomAccessMemoryModule parent) {
-            this.parent = parent;
-        }
+
+    private record peek(RandomAccessMemoryModule parent) implements ILuaFunction {
         @Override
         @NotNull
         public MethodResult call(@NotNull IArguments iArguments) throws LuaException {
