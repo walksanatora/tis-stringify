@@ -93,7 +93,7 @@ public class StringModule extends AbstractModuleWithRotation {
             if (!receivingPipe.isReading()) {
                 receivingPipe.beginRead();
             }
-            if (receivingPipe.canTransfer() && (state == STATE.AWAITING_INPUT) ) {
+            if (receivingPipe.canTransfer() ) {
                 switch (this.mode) {
                     case INT -> {
                         outbuf.append(receivingPipe.read());
