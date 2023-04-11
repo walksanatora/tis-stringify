@@ -1,6 +1,8 @@
 package net.walksanator.tisstring.mixin;
 
+import li.cil.tis3d.common.module.execution.compiler.instruction.UnaryInstructionEmitter;
 import net.walksanator.tisstring.TISString;
+import net.walksanator.tisstring.instructions.LoadInstruction;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -18,6 +20,8 @@ public class MixinCompiler {
     )
     private static @SuppressWarnings("all") ImmutableMap.Builder<String,InstructionEmitter> tisAdvanced$instructionMapModifier(ImmutableMap.Builder<String,InstructionEmitter> builder) {
         TISString.LOGGER.info("Started reg custom ops");
+
+        builder.put(LoadInstruction.NAME, new UnaryInstructionEmitter(()->LoadInstruction.INSTANCE));
 
         //// Floating point arithmetic operations
         //builder.put(FloatAddInstruction.NAME, new TargetOrImmediateInstructionEmitter(FloatAddInstruction::new, FloatAddImmediateInstruction::new));
